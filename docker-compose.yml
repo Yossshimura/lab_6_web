@@ -1,0 +1,48 @@
+version: '3.8'
+
+services:
+  php:
+    build: .
+    container_name: lab6_php
+    volumes:
+      - ./www:/var/www/html
+    ports:
+      - "8080:80"
+    depends_on:
+      - redis
+      - elasticsearch
+      - clickhouse
+    networks:
+      - default_network
+
+  redis:
+    image: redis:7
+    container_name: lab6_redis
+    ports:
+      - "6379:6379"
+    networks:
+      - default_network
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.10.2
+    container_name: lab6_elastic
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+    ports:
+      - "9200:9200"
+    networks:
+      - default_network
+
+  clickhouse:
+    image: clickhouse/clickhouse-server:24
+    container_name: lab6_clickhouse
+    ports:
+      - "8123:8123"
+      - "9000:9000"
+    networks:
+      - default_network
+
+networks:
+  default_network:
+    driver: bridge
